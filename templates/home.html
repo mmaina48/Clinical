@@ -4,4 +4,35 @@
 
 {% block body %}
 <h1>Geting started</h1>
+<form action="{{ url_for('reg')}}", method="POST">
+    <div>
+        {{ form.username(class_='form-control',placeholder='Username', autocomplete='off', autofocus=true)}}
+        <ul>
+            {% for erro in form.username.errors %}
+                <li>{{ erro }}</li>
+            {% endfor %}    
+        </ul>
+    </div>
+    <div>
+        {{ form.password(class_='form-control',placeholder='password')}}
+        <ul>
+            {% for erro in form.password.errors %}
+                <li>{{ erro }}</li>
+            {% endfor %}    
+        </ul>   
+    </div>
+    <div>
+        {{ form.confirm_pswd(class_='form-control',placeholder='Retype Password')}}
+        <ul>
+            {% for erro in form.confirm_pswd.errors %}
+                <li>{{ erro }}</li>
+            {% endfor %}    
+        </ul>
+    </div> 
+    <div>
+        {{ form.submit_button}}
+    </div>
+    {{form.csrf_token}}
+</form>
+
 {% endblock %}
