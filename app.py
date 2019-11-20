@@ -1,4 +1,5 @@
-from flask import Flask, render_template,redirect,url_for
+from flask import Flask, render_template, redirect,url_for
+from passlib.hash import pbkdf2_sha256
 from wtform_fields import *
 from models import *
 
@@ -21,13 +22,17 @@ db=SQLAlchemy(app)
 @app.route('/', methods=['GET', 'POST'])
 def reg():
 
-    reg_form=RegistrationForm()
+    reg_form = RegistrationForm()
 #update database if validation sucessfull
     if reg_form.validate_on_submit():
         username = reg_form.username.data
         password = reg_form.password.data
 
-        user = User(username=username, password=password)
+        # hashed password
+        hashed_passwd=pbkdf2_sha256.hash(password)
+
+
+        user = User(username=username, password=hashed_passwd)
         db.session.add(user)
         db.session.commit()
 
