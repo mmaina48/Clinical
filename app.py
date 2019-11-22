@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, flash
 from flask_login import LoginManager, login_user, current_user, login_required , logout_user
 from passlib.hash import pbkdf2_sha256
 from wtform_fields import *
@@ -39,11 +39,12 @@ def reg():
         # hashed password
         hashed_passwd=pbkdf2_sha256.hash(password)
 
-
+        #add user to db
         user = User(username=username, password=hashed_passwd)
         db.session.add(user)
         db.session.commit()
 
+        flash('Succefull added the User','success')
         return redirect(url_for('login'))        
 
     return render_template("home.html", form=reg_form)
@@ -58,14 +59,15 @@ def login():
         user_object = User.query.filter_by(username=loginform.username.data).first()
         login_user(user_object)
         return redirect(url_for('chat'))
-        
-
+ 
     return render_template("login.html", form=loginform)
 
+# chat is a protected route you have to be login to access it
 @app.route("/chat", methods=['GET','POST'])
 def chat():
 
-    if not current_user.is_authenticated:
+    if not current_user.is_authenticated:   
+        flash('please login', 'danger')
         return redirect(url_for('login'))
 
     return " chat PAGE"
@@ -74,7 +76,8 @@ def chat():
 def logout():
 
     logout_user()
-    return "Logout using flask-login"
+    flash('Successfully Logged Out!','success')
+    return redirect(url_for('login'))
 
 
 
