@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, flash
 from flask_login import LoginManager, login_user, current_user, login_required , logout_user
+from flask_socketio import SocketIO, send, emit
 from passlib.hash import pbkdf2_sha256
 from wtform_fields import *
 from models import *
@@ -17,6 +18,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://hohloipsofwxru:c3f564adeb73c
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db=SQLAlchemy(app)
+
+#initi flask_socketio
+socketio = SocketIO(app)
 
 #configuring flask login
 login= LoginManager(app)
@@ -66,11 +70,11 @@ def login():
 @app.route("/chat", methods=['GET','POST'])
 def chat():
 
-    if not current_user.is_authenticated:   
-        flash('please login', 'danger')
-        return redirect(url_for('login'))
+    # if not current_user.is_authenticated:   
+    #     flash('please login', 'danger')
+    #     return redirect(url_for('login'))
 
-    return " chat PAGE"
+    return render_template('chat.html')
 
 @app.route("/logout", methods=['GET'])
 def logout():
@@ -80,6 +84,12 @@ def logout():
     return redirect(url_for('login'))
 
 
+#eventbutckets eventhanduler
+@socketio.on('message')
+def message(data):
+    # print(f"\n\n{data}\n\n")
+    send(data)
+    # emit('some-event','this is a custom event message')
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == "__main__":  
+    socketio.run(app, debug=True)
